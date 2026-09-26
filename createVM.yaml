@@ -1,0 +1,49 @@
+---
+- name: Create Debian & Fedora VMs via Ansible
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - vars.yaml
+
+  tasks:
+
+    - name: Create VMs from vars.yaml lists
+      google.cloud.gcp_compute_instance:
+        name: "{{ instance_name[index] }}"
+        machine_type: "{{ machine_type }}"
+        zone: "{{ Zones[0] }}"
+        project: "{{ gcp_project }}"
+        state: present
+
+        disks:
+          - auto_delete: true
+            boot: true
+            initialize_params:
+              source_image: "projects/{{ image_project[index] }}/global/images/family/{{ image_family[index] }}"
+
+        network_interfaces:
+          - network:
+              name: default
+            access_configs:
+              - name: "EXTERNAL NAT"
+                type: ONE_TO_ONE_NAT
+
+
+        tags:
+          items:
+            - default-allow-ssh
+
+        auth_kind: "{{ gcp_auth_kind }}"
+        service_account_file: "{{ gcp_cred_file }}"
+      loop: "{{ instance_name }}"
+      loop_control:
+        index_var: index
+      register: gce_results
+
+    - name: Show public IPs
+      debug:
+        msg: "{{ item.name }} → {{ item.networkInterfaces[0].accessConfigs[0].nat_ip | default('No external IP') }}"
+      loop: "{{ gce_results.results }}"
+
+

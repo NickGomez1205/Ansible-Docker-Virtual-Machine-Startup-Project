@@ -1,0 +1,11 @@
+---
+- name: Install figlet on Fedora
+  hosts: fedora
+  become: yes
+  tasks:
+
+    - name: Ensure figlet is installed
+      dnf:
+        name: figlet
+        state: present
+        update_cache: yes

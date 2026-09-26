@@ -1,0 +1,17 @@
+---
+gcp_project: "devops-475120"
+Zones: ["us-central1-a"]
+machine_type: "e2-medium"
+image_project: 
+ - "debian-cloud"
+ - "fedora-cloud"
+image_family: 
+ - "debian-11"
+ - "fedora-cloud-42-x86-64"
+
+instance_name: 
+  - "devops-ansible-debian"
+  - "devops-ansible-fedora"
+
+gcp_cred_file: "/home/nickgomez1205/key.json"
+gcp_auth_kind: "serviceaccount"
